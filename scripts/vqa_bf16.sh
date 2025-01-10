@@ -71,7 +71,7 @@ echo "Logs saved in: $RUN_DIR"
 python3 $OPTIMUM_PATH/gaudi_spawn.py \
     --world_size $WORLD_SIZE \
     --use_deepspeed \
-    pipeline_wrapper.py \
+    ./scripts/pipeline_wrapper.py \
     --model_name_or_path "$MODEL" \
     --use_kv_cache \
     --warmup 3 \
