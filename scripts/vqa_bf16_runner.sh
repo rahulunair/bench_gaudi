@@ -41,6 +41,9 @@ done
 if [ "$MODEL_SIZE" = "90b" ]; then
     # Configs for 90B model
     CONFIGS=(
+        "128 8"
+        "128 64"
+        "128 128" 
         "128 256"    # From 1750 (70B)
         "128 128"    # From 512 (70B)
         "2048 64"    # From 242 (70B)
@@ -49,8 +52,12 @@ if [ "$MODEL_SIZE" = "90b" ]; then
 else
     # Configs for 11B model
     CONFIGS=(
+        "128 1"
+        "128 8"
+        "128 32"
+        "128 64"
+        "128 128"
         "128 1024"   # From 1536 (7B)
-        "128 128"    # From 217 (7B)
         "2048 96"    # From 153 (7B)
         "2048 64"    # From 117 (7B)
     )
