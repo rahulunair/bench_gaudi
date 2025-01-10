@@ -68,7 +68,7 @@ echo "Running BF16 benchmarks for ${MODEL_SIZE} model on ${WORLD_SIZE} cards..."
 for config in "${CONFIGS[@]}"; do
     read -r input_len output_len batch_s <<< "$config"
     echo "Running with input_tokens=$input_len output_tokens=$output_len batch_size=$batch_s"
-    python $OPTIMUM_PATH/gaudi_spawn.py \
+    python3 $OPTIMUM_PATH/gaudi_spawn.py \
         --use_deepspeed \
         --world_size $WORLD_SIZE \
         $OPTIMUM_PATH/text-generation/run_generation.py \

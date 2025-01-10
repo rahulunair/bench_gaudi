@@ -74,7 +74,7 @@ mkdir -p "$OUTPUT_DIR"
 # Stage 1: Measure Tensor Quantization Statistics
 if [ "$RUN_MEASURE" = true ]; then
     echo "Starting quant stats measurement for model: $MODEL on $WORLD_SIZE cards." | tee "${OUTPUT_DIR}/run_measure.log"
-    QUANT_CONFIG="$QUANT_CONFIG_DIR/$MEASURE_CONFIG" python $EXAMPLES_PATH/gaudi_spawn.py \
+    QUANT_CONFIG="$QUANT_CONFIG_DIR/$MEASURE_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
         --use_deepspeed \
         --world_size $WORLD_SIZE \
         $TEXT_GEN_PATH/run_lm_eval.py \
@@ -97,7 +97,7 @@ fi
 # Stage 2: Quantize and Run the Model
 sleep 10
 echo "Starting quantization with batch size 1 for ${MODEL_SIZE} model on ${WORLD_SIZE} cards..."
-QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python $EXAMPLES_PATH/gaudi_spawn.py \
+QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
     --use_deepspeed \
     --world_size $WORLD_SIZE \
     $TEXT_GEN_PATH/run_generation.py \
@@ -121,7 +121,7 @@ for config in "${CONFIGS[@]}"; do
     read -r input_len output_len batch_s <<< "$config"
     echo "Running ${MODEL_SIZE} model with input_tokens=$input_len output_tokens=$output_len batch_size=$batch_s on ${WORLD_SIZE} cards"
     
-    QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python $EXAMPLES_PATH/gaudi_spawn.py \
+    QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
         --use_deepspeed \
         --world_size $WORLD_SIZE \
         $TEXT_GEN_PATH/run_generation.py \

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Visual Question Answering Benchmark Script
+# Visual Question Answering BF16 Script
 #
 # Usage:
-#   ./bench.sh [options] <output_tokens> <batch_size>
+#   ./scripts/vqa_bf16.sh [options] <output_tokens> <batch_size>
 #
 # Options:
 #   --model-size <11b|90b>  Model size to run (default: 11b)
@@ -12,8 +12,8 @@
 #   --help                Display this help message
 #
 # Example:
-#   ./bench.sh --model-size 11b 128 256  # Run 11B model with output_tokens=128, batch_size=256
-#   ./bench.sh --model-size 90b 128 64   # Run 90B model with output_tokens=128, batch_size=64
+#   ./scripts/vqa_bf16.sh --model-size 11b 128 256  # Run 11B model with output_tokens=128, batch_size=256
+#   ./scripts/vqa_bf16.sh --model-size 90b 128 64   # Run 90B model with output_tokens=128, batch_size=64
 
 export HF_DATASETS_TRUST_REMOTE_CODE=true
 export PT_HPU_MEMORY_LIMIT=99
@@ -64,11 +64,11 @@ OUTPUT_DIR="benchmark_results/${MODEL_NAME}/vqa"
 RUN_DIR="${OUTPUT_DIR}/tokens_${OUTPUT_TOKENS}_bs_${BATCH_SIZE}"
 mkdir -p "$RUN_DIR"
 
-echo "Running VQA benchmark for ${MODEL_SIZE} model on ${WORLD_SIZE} cards"
+echo "Running VQA BF16 for ${MODEL_SIZE} model on ${WORLD_SIZE} cards"
 echo "Configuration: OUTPUT_TOKENS=$OUTPUT_TOKENS, BATCH_SIZE=$BATCH_SIZE"
 echo "Logs saved in: $RUN_DIR"
 
-python $OPTIMUM_PATH/gaudi_spawn.py \
+python3 $OPTIMUM_PATH/gaudi_spawn.py \
     --world_size $WORLD_SIZE \
     --use_deepspeed \
     pipeline_wrapper.py \
