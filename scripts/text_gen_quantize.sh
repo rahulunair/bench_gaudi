@@ -19,6 +19,7 @@
 export HF_DATASETS_TRUST_REMOTE_CODE=true
 export PT_HPU_MEMORY_LIMIT=99
 MODEL_SIZE="11b"
+WORLD_SIZE=1
 
 
 show_help() {
@@ -73,21 +74,24 @@ mkdir -p "$OUTPUT_DIR"
 
 # Stage 1: Measure Tensor Quantization Statistics
 if [ "$RUN_MEASURE" = true ]; then
-    echo "Starting quant stats measurement for model: $MODEL on ${WORLD_SIZE} cards." | tee "${OUTPUT_DIR}/run_measure.log"
+    echo "Starting quant stats measurement for model: $MODEL on ${WORLD_SIZE} cards..."
     QUANT_CONFIG="$QUANT_CONFIG_DIR/$MEASURE_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
-        --world_size $WORLD_SIZE \
+        --world_size "${WORLD_SIZE}" \
         --use_deepspeed \
         $TEXT_GEN_PATH/run_lm_eval.py \
         --model_name_or_path "$MODEL" \
         --use_kv_cache \
         --bucket_size=128 \
         --use_hpu_graphs \
-        --trim_logits \
-        --batch_size 1 \
+        --limit_hpu_graphs \
         --bf16 \
+        --warmup 2 \
+        --trim_logits \
+        --attn_softmax_bf16 \
         --use_flash_attention \
         --flash_attention_recompute \
-        --flash_attention_causal_mask 2>&1 | tee -a "${OUTPUT_DIR}/run_measure.log"
+        --flash_attention_causal_mask \
+        -o "${OUTPUT_DIR}/measure_results.txt" 2>&1 | tee -a "${OUTPUT_DIR}/run_measure.log"
     echo "Measurement completed. Results saved in ${OUTPUT_DIR}/measure_results.txt"
 else
     echo "Skipping quantization measurement phase."
@@ -97,7 +101,7 @@ fi
 sleep 10
 echo "Starting quantization with batch size 1 for ${MODEL_SIZE} model on ${WORLD_SIZE} cards..."
 QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
-    --world_size $WORLD_SIZE \
+    --world_size "${WORLD_SIZE}" \
     --use_deepspeed \
     $TEXT_GEN_PATH/run_generation.py \
     --model_name_or_path "$MODEL" \
@@ -121,7 +125,7 @@ for config in "${CONFIGS[@]}"; do
     echo "Running ${MODEL_SIZE} model with input_tokens=$input_len output_tokens=$output_len batch_size=$batch_s on ${WORLD_SIZE} cards"
     
     QUANT_CONFIG="$QUANT_CONFIG_DIR/$QUANT_CONFIG" python3 $EXAMPLES_PATH/gaudi_spawn.py \
-        --world_size $WORLD_SIZE \
+        --world_size "${WORLD_SIZE}" \
         --use_deepspeed \
         $TEXT_GEN_PATH/run_generation.py \
         --model_name_or_path "$MODEL" \
