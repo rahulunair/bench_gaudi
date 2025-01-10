@@ -39,7 +39,7 @@ done
 echo "Starting VQA BF16 benchmarks for ${MODEL_SIZE} model..."
 echo "=================================================="
 
-./scripts/vqa_bf16_wrapper.sh --model-size $MODEL_SIZE
+./scripts/vqa_bf16.sh --model-size $MODEL_SIZE
 
 echo "=================================================="
 echo "VQA BF16 benchmarks completed for ${MODEL_SIZE} model"
