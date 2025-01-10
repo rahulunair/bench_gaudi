@@ -22,11 +22,24 @@ set -u
 set -o pipefail
 
 CONTAINER_NAME="gaudi_setup"
-DOCKER_IMAGE="vault.habana.ai/gaudi-docker/1.18.0/ubuntu22.04/habanalabs/pytorch-installer-2.4.0:latest"
+# Default container for 1.18.0
+DEFAULT_DOCKER_IMAGE="vault.habana.ai/gaudi-docker/1.18.0/ubuntu22.04/habanalabs/pytorch-installer-2.4.0:latest"
+# Container for 1.19.0
+NEW_DOCKER_IMAGE="vault.habana.ai/gaudi-docker/1.19.0/ubuntu24.04/habanalabs/pytorch-installer-2.5.1:latest"
+
 MOUNT_PATH="/tmp:/mnt"
 HOME_MOUNT="$HOME:/root"
 WORKSPACE_DIR=$(pwd)
 
+GAUDI_VERSION=$(hl-smi -v 2>/dev/null | grep -oP 'hl-\K\d+\.\d+\.\d+' || echo "1.18.0")
+echo "Detected Gaudi firmware version: ${GAUDI_VERSION}"
+if [[ "${GAUDI_VERSION}" == "1.19.0" ]]; then
+    DOCKER_IMAGE="${NEW_DOCKER_IMAGE}"
+    echo "Using PyTorch 2.5.1 container for Gaudi ${GAUDI_VERSION}"
+else
+    DOCKER_IMAGE="${DEFAULT_DOCKER_IMAGE}"
+    echo "Using default PyTorch 2.4.0 container for Gaudi ${GAUDI_VERSION}"
+fi
 
 check_container_state() {
     if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
