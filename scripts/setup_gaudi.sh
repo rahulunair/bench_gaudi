@@ -94,13 +94,13 @@ docker run -d --runtime=habana \
     export HF_HOME=/mnt/huggingface && \
     mkdir -p \$HF_HOME && \
     echo 'Verifying installations...' && \
-    python -c 'import torch; print(\"PyTorch version:\", torch.__version__)' && \
     echo 'Setup completed successfully!' && \
     tail -f /dev/null"
 
 sleep 5
 
 echo "Waiting for setup to complete..."
+echo "To view setup progress in real-time: docker logs -f $CONTAINER_NAME"
 timeout=300  # 5 minutes timeout
 start_time=$(date +%s)
 while true; do
